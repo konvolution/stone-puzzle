@@ -138,6 +138,15 @@ h1 { font-size: clamp(1.6rem, 6vw, 2.4rem); font-weight: 800; letter-spacing: 0.
 
 .cell:active { transform: scale(0.88); }
 
+/* Stone landing animation */
+@keyframes pop {
+  0%   { transform: scale(0.6); }
+  60%  { transform: scale(1.25); }
+  80%  { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+.cell.pop { animation: pop 0.28s cubic-bezier(.36,.07,.19,.97) both; }
+
 /* ── Message ── */
 #message {
   min-height: 2rem;
@@ -187,6 +196,14 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
   z-index: 100;
   backdrop-filter: blur(4px);
 }
+/* ── Particle canvas ── */
+#particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
 #modal-overlay.hidden { display: none; }
 #modal {
   background: var(--surface);
