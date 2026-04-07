@@ -8,10 +8,9 @@ const GREEN       = 'green';
 const YELLOW      = 'yellow';
 
 // ── State ──────────────────────────────────────────────────────────────────
-let board    = [];   // current positions
-let history  = [];   // stack of previous board snapshots
-let moves    = 0;
-let selected = null; // index of currently selected stone
+let board   = [];   // current positions
+let history = [];   // stack of previous board snapshots
+let moves   = 0;
 
 // ── DOM refs ───────────────────────────────────────────────────────────────
 const boardEl       = document.getElementById('board');
@@ -33,10 +32,9 @@ function makeInitialBoard() {
 }
 
 function init() {
-  board    = makeInitialBoard();
-  history  = [];
-  moves    = 0;
-  selected = null;
+  board   = makeInitialBoard();
+  history = [];
+  moves   = 0;
   render();
 }
 
@@ -100,53 +98,22 @@ function applyMove(from, to) {
 }
 
 // ── Interaction ────────────────────────────────────────────────────────────
+// A stone always has at most one valid target (slide and leap are mutually
+// exclusive), so a single tap on a movable stone moves it immediately.
 function handleCellClick(idx) {
   if (isWin()) return;
+  if (board[idx] === EMPTY) return;
 
-  const movable = getMovableIndices();
+  const targets = getTargets(idx);
+  if (targets.length === 0) return; // stone has no legal move
 
-  if (selected === null) {
-    // Select a movable stone
-    if (board[idx] !== EMPTY && movable.includes(idx)) {
-      selected = idx;
-      render();
-    }
-    return;
-  }
-
-  // A stone is already selected
-  if (idx === selected) {
-    // Deselect
-    selected = null;
-    render();
-    return;
-  }
-
-  const targets = getTargets(selected);
-
-  if (targets.includes(idx)) {
-    // Valid move
-    applyMove(selected, idx);
-    selected = null;
-    render();
-
-    if (isWin()) {
-      messageEl.textContent = '🎉 Puzzle solved!';
-      messageEl.className   = 'win';
-    }
-    return;
-  }
-
-  // Clicked a different movable stone — switch selection
-  if (board[idx] !== EMPTY && movable.includes(idx)) {
-    selected = idx;
-    render();
-    return;
-  }
-
-  // Invalid click — deselect
-  selected = null;
+  applyMove(idx, targets[0]);
   render();
+
+  if (isWin()) {
+    messageEl.textContent = '🎉 Puzzle solved!';
+    messageEl.className   = 'win';
+  }
 }
 
 // ── Render ─────────────────────────────────────────────────────────────────
@@ -154,7 +121,6 @@ function render() {
   boardEl.innerHTML = '';
 
   const movable = isWin() ? [] : getMovableIndices();
-  const targets  = selected !== null ? getTargets(selected) : [];
 
   board.forEach((color, idx) => {
     const cell = document.createElement('div');
@@ -162,11 +128,9 @@ function render() {
 
     if (color !== EMPTY) {
       cell.classList.add(color);
-      if (idx === selected)           cell.classList.add('selected');
-      else if (movable.includes(idx)) cell.classList.add('movable');
+      if (movable.includes(idx)) cell.classList.add('movable');
     } else {
       cell.classList.add('empty');
-      if (targets.includes(idx))      cell.classList.add('target');
     }
 
     cell.setAttribute('role', 'button');
@@ -188,9 +152,8 @@ function render() {
 // ── Undo ───────────────────────────────────────────────────────────────────
 btnUndo.addEventListener('click', () => {
   if (history.length === 0) return;
-  board    = history.pop();
-  moves    = Math.max(0, moves - 1);
-  selected = null;
+  board   = history.pop();
+  moves   = Math.max(0, moves - 1);
   messageEl.textContent = '';
   messageEl.className   = '';
   render();

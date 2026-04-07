@@ -89,20 +89,24 @@ h1 { font-size: clamp(1.6rem, 6vw, 2.4rem); font-weight: 800; letter-spacing: 0.
   background: var(--board-bg);
   border-radius: var(--radius);
   box-shadow: 0 6px 0 var(--board-shadow), 0 8px 20px rgba(0,0,0,0.5);
-  padding: clamp(8px, 2.5vw, 14px);
-  gap: clamp(4px, 1.5vw, 8px);
+  padding: clamp(6px, 2vw, 12px);
+  gap: clamp(3px, 1vw, 6px);
   flex-wrap: nowrap;
-  width: fit-content;
-  max-width: 100%;
+  width: calc(100vw - 2rem);
+  max-width: 520px;
+  box-sizing: border-box;
 }
 
-/* ── Cell ── */
+/* ── Cell ──
+   Size = (board width - 2×padding - 10×gap) / 11
+   We use a fluid calc so it auto-scales on any screen width.        */
 .cell {
-  width:  clamp(36px, 8vw, 58px);
-  height: clamp(36px, 8vw, 58px);
+  /* (100vw - 2rem app padding - 2×clamp(6px) board padding - 10×clamp(3px) gaps) / 11 */
+  width:  clamp(24px, calc((100vw - 2rem - 12px - 30px) / 11), 44px);
+  height: clamp(24px, calc((100vw - 2rem - 12px - 30px) / 11), 44px);
   border-radius: 50%;
   background: var(--empty);
-  border: 3px solid rgba(0,0,0,0.25);
+  border: 2px solid rgba(0,0,0,0.25);
   cursor: default;
   transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
   position: relative;
@@ -132,27 +136,7 @@ h1 { font-size: clamp(1.6rem, 6vw, 2.4rem); font-weight: 800; letter-spacing: 0.
   to   { box-shadow: 0 0 0 3px white, 0 0 18px 6px rgba(255,255,255,0.7); }
 }
 
-/* Selected stone */
-.cell.selected {
-  transform: scale(1.18);
-  box-shadow: 0 0 0 3px white, 0 0 16px 6px rgba(255,255,255,0.6);
-  z-index: 2;
-}
-
-/* Valid landing target */
-.cell.target {
-  background: rgba(255,255,255,0.18);
-  border-color: rgba(255,255,255,0.7);
-  cursor: pointer;
-  animation: blink 0.8s infinite alternate;
-}
-@keyframes blink {
-  from { background: rgba(255,255,255,0.12); }
-  to   { background: rgba(255,255,255,0.3); }
-}
-
-.cell:active { transform: scale(0.92); }
-.cell.selected:active { transform: scale(1.08); }
+.cell:active { transform: scale(0.88); }
 
 /* ── Message ── */
 #message {
